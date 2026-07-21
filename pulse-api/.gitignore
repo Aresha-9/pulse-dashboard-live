@@ -1,0 +1,4 @@
+node_modules/
+pulse.db
+pulse.db-shm
+pulse.db-wal
