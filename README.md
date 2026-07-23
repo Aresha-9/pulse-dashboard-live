@@ -1,69 +1,38 @@
-# Pulse — React + MUI Analytics Dashboard
+# Pulse Dashboard — ab live hai
 
-Ek dusra **React + MUI** project — is baar ek analytics dashboard, dark sidebar aur data charts ke sath (pehle wala TaskFlow ek task manager tha).
+Ye zip do folders rakhta hai:
 
-## Features
-- Dark indigo sidebar with live "pulse" status indicator, working nav — click Orders, Customers, Insights, or Settings and the page actually changes
-- Overview: stat cards + revenue chart + recent orders
-- Orders: full order list with a live search box (filter by order ID or customer)
-- Customers: customer table with avatars, order counts, total spent
-- Insights: conversion-rate stats and a trend chart
-- Settings: workspace preferences form (name, email, toggles) — the Dark mode switch actually flips the whole app's theme
-- Real dark mode: toggle it from Settings, whole app (backgrounds, text, charts, tables) switches instantly
-- Fully responsive: sidebar becomes a slide-over drawer on mobile, stat cards reflow, tables scroll horizontally on small screens
-- Custom MUI theme — "Pulse" palette (indigo + coral + teal + amber), Sora + IBM Plex Mono fonts
+- **`pulse-api/`** — Node/Express + SQLite backend jo pehle `mockData.js` mein hardcoded data serve karta hai
+- **`pulse-dashboard/`** — wahi React dashboard, ab live API se fetch karta hai (poll every 8s)
 
-## Tech stack
-- React 18
-- MUI (Material UI) v5 + Emotion
-- Recharts (for the revenue chart)
-- Vite
+## Chalane ka tareeqa (dono terminals mein)
 
-## Run it locally
-
+**Terminal 1 — backend:**
 ```bash
+cd pulse-api
+npm install
+npm start
+```
+Ye `http://localhost:4000` pe chalega aur pehli baar `pulse.db` (SQLite) khud bana kar seed kar dega.
+
+**Terminal 2 — frontend:**
+```bash
+cd pulse-dashboard
 npm install
 npm run dev
 ```
+Ye `http://localhost:5173` (ya jo bhi Vite port de) pe khulega aur backend se live data lega.
 
-Open the printed localhost URL (usually http://localhost:5173).
+## Kya badla
 
-## Build for production
+- `src/data/mockData.js` ab kahin import nahi hoti — reference ke liye rakhi hai
+- `src/api.js` — naya file, backend se fetch karne ke functions
+- `src/hooks/usePolledData.js` — naya hook, jo data fetch kar ke har 8 second baad refresh karta hai (loading/error states ke sath)
+- `Overview.jsx`, `Orders.jsx`, `Customers.jsx`, `Insights.jsx` — sab ab live data use karte hain, hardcoded imports hata diye gaye
+- `.env.example` — agar backend kahin aur (Railway/Render) deploy karein to `VITE_API_URL` yahan set karein
 
-```bash
-npm run build
-npm run preview
-```
+## Live feel kaise kaam karti hai
 
-## Project structure
+Har page apna data har 8 second baad background mein refresh karta hai (`POLL_INTERVAL_MS` `src/api.js` mein). Agar aap backend ke `POST /api/orders` endpoint se koi naya order bhej dein (Postman/curl se), to wo order Orders page pe apne aap agle refresh cycle mein dikh jayega — bina page reload kiye.
 
-```
-pulse-dashboard/
-├── index.html
-├── package.json
-├── vite.config.js
-└── src/
-    ├── main.jsx
-    ├── App.jsx            # page routing (state-based, no react-router)
-    ├── theme.js           # getTheme(mode) — returns light or dark MUI theme
-    ├── context/
-    │   └── ColorModeContext.jsx   # shares dark-mode state + toggle app-wide
-    ├── data/
-    │   └── mockData.js       # replace with real API data
-    ├── pages/
-    │   ├── Overview.jsx
-    │   ├── Orders.jsx
-    │   ├── Customers.jsx
-    │   ├── Insights.jsx
-    │   └── Settings.jsx
-    └── components/
-        ├── Sidebar.jsx
-        ├── TopBar.jsx
-        ├── StatCard.jsx
-        ├── RevenueChart.jsx
-        └── OrdersTable.jsx
-```
-
-## Notes for extending
-- All mock data lives in `src/data/mockData.js` — swap it for a fetch to your Express/MongoDB API to make it live.
-- Palette and fonts are centralized in `theme.js` under `palette.custom` — change them once to reskin everything.
+Zyada tafseel ke liye `pulse-api/README.md` dekhein.
